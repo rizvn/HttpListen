@@ -19,6 +19,27 @@ public class RequestHandler implements HttpHandler
     this.props = props;
   }
 
+  @Override
+  public void handle(HttpExchange exchange) throws IOException
+  {
+    if(exchange.getRequestMethod().equals("POST"))
+    {
+      String fileName = UUID.randomUUID().toString();
+      File outFile    = new File(props.outputDir, fileName);
+
+      try(InputStream in   = exchange.getRequestBody();
+          OutputStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(outFile))))
+      {
+        transferInputToOutput(in, out);
+        respondWith(exchange, 200, "SUCCESS");
+      }
+    }
+    else
+    {
+      respondWith(exchange, 405, "Method not allowed");
+    }
+  }
+
   public void respondWith(HttpExchange exchange, int code, String content)
   {
     try
@@ -49,27 +70,6 @@ public class RequestHandler implements HttpHandler
     catch (Exception ex)
     {
       throw new IllegalStateException(ex);
-    }
-  }
-
-  @Override
-  public void handle(HttpExchange exchange) throws IOException
-  {
-    if(exchange.getRequestMethod().equals("POST"))
-    {
-      String fileName = UUID.randomUUID().toString();
-      File outFile    = new File(props.outputDir, fileName);
-
-      try(InputStream in   = exchange.getRequestBody();
-          OutputStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(outFile))))
-      {
-        transferInputToOutput(in, out);
-        respondWith(exchange, 200, "SUCCESS");
-      }
-    }
-    else
-    {
-      respondWith(exchange, 405, "Method not allowed");
     }
   }
 }
