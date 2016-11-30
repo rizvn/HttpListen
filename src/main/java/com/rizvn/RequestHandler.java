@@ -28,7 +28,7 @@ public class RequestHandler implements HttpHandler
       File outFile    = new File(props.outputDir, fileName);
 
       try(InputStream in   = exchange.getRequestBody();
-          OutputStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(outFile))))
+          OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile)))
       {
         transferInputToOutput(in, out);
         respondWith(exchange, 200, "SUCCESS");
