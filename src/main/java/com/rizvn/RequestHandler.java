@@ -24,14 +24,20 @@ public class RequestHandler implements HttpHandler
   {
     if(exchange.getRequestMethod().equals("POST"))
     {
-      String fileName = UUID.randomUUID().toString();
-      File outFile    = new File(props.outputDir, fileName);
+      try {
+        String fileName = UUID.randomUUID().toString();
+        File outFile = new File(props.outputDir, fileName);
 
-      try(InputStream in   = exchange.getRequestBody();
-          OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile)))
+        try (InputStream in = exchange.getRequestBody();
+             OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile))) {
+          transferInputToOutput(in, out);
+          respondWith(exchange, 200, "SUCCESS");
+        }
+      }
+      catch (Exception ex)
       {
-        transferInputToOutput(in, out);
-        respondWith(exchange, 200, "SUCCESS");
+        ex.printStackTrace();
+        respondWith(exchange, 500, "Internal server error");
       }
     }
     else
